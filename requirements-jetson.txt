@@ -1,0 +1,25 @@
+# MEDIFLY-MAP Jetson Orin Nano Super 실행 의존성
+#
+# 설치 순서
+#   1) OpenCV 를 apt 로 먼저 설치
+#      GStreamer 와 aruco(contrib) 가 포함된 빌드여야 함
+#        sudo apt install -y python3-opencv v4l-utils
+#
+#   2) PyTorch / torchvision 은 JetPack 버전에 맞는 NVIDIA 휠을 별도로 설치
+#      데스크톱용 휠을 설치하면 CUDA 동작 X
+#        python3 -c "import torch; print(torch.__version__, torch.cuda.is_available())"
+#
+#   3) 시스템 OpenCV 를 쓰려면 venv 를 --system-site-packages 로 생성
+#        python3 -m venv --system-site-packages ~/venvs/medifly
+#
+#   4) 그 뒤 해당 파일 설치
+#        pip install -r requirements-jetson.txt
+#
+# Jetson.GPIO 는 JetPack 에 기본 포함되어 있어 별도 설치가 필요 없음
+
+ultralytics[export]>=8.2,<9
+mavsdk>=1.4
+pymavlink>=2.4,<3
+requests>=2.28
+PyYAML>=6.0
+numpy<2
