@@ -28,7 +28,7 @@
 #include <ESP32Servo.h>
 
 // ══════════ 네트워크 ══════════
-const char* WIFI_SSID = "medifly_afec";   // 핫스팟 이름
+const char* WIFI_SSID = "your_hotspot_name";   // 핫스팟 이름 기입
 const char* WIFI_PASS = "********";       // 핫스팟 비밀번호 기입
 const char* HOSTNAME  = "vertiport";        // http://vertiport.local
 
