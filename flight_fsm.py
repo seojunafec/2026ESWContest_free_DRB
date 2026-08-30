@@ -58,7 +58,7 @@ GRIPPER_CLOSE = 180        # 닫힘. 상자 파지
 GRIPPER_SETTLE_SEC = 1.5   # 체결 후 안정화 대기
 
 # --- 버티포트 ESP32 ---
-ESP32_URL = "http://172.20.10.12"   # mDNS 사용 시 "http://vertiport.local"
+ESP32_URL = "http://vertiport.local"
 ESP32_TRIES = 3
 ESP32_TIMEOUT = 15.0
 LAND_SETTLE_SEC = 2.0      # 접지 후 기체가 안정될 때까지 대기
