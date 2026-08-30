@@ -1,11 +1,11 @@
 # 비전 기반 자율 의료 배송 드론과 스마트 버티포트 시스템
 
 미션 웨이포인트를 비행하며 YOLO로 요구조자를 탐지하고, 접근하여 구호 물자를
-투하한 뒤 복귀한다. 복귀 지점에서는 ArUco 마커 기반 비주얼 서보잉으로
+투하한 뒤 복귀한다. 복귀 지점에서는 ArUco Marker 기반 비주얼 서보잉으로
 버티포트 중앙에 정밀 착륙하고, 리프트가 올린 새 상자를 그리퍼로 체결한다.
 
 GPS 기반 RTL만으로는 cm 단위 정밀 착륙이 어렵기 때문에,
-RTL을 조대 정렬(coarse)로, 비주얼 서보잉을 미세 정렬(fine)로 쓰는
+RTL을 조대 정렬로, 비주얼 서보잉을 미세 정렬로 쓰는
 이중 루프 구조를 채택했다.
 
 ---
@@ -17,7 +17,7 @@ RTL을 조대 정렬(coarse)로, 비주얼 서보잉을 미세 정렬(fine)로 �
 | 비행 컨트롤러 | Pixhawk 6C (PX4) |
 | 온보드 컴퓨터 | Jetson Orin Nano Super 8GB |
 | 카메라 | ELP-USBGS1200P01 (AR0234 글로벌 셔터, 1920×1200) |
-| 짐벌 | 2축 (롤/피치). 카본 파이프로 전방 26cm 돌출 |
+| 짐벌 | 2축 (롤/피치 보상). 카본 파이프로 전방 26cm 돌출 |
 | 지상국 | QGroundControl |
 | 버티포트 | ESP32 + 리프트 서보 2 + 사출 서보 4 |
 
@@ -39,10 +39,10 @@ Pixhawk ──UART── Jetson ──┬── 14550 : pymavlink (짐벌 제어
 |---|---|
 | P0 INIT | 미션 비행. 요구조자 락온 대기 |
 | P1 SEARCHING | 타겟 로스트. 제자리 호버링 |
-| P2 APPROACHING | 요 정렬하며 전진 접근. 짐벌 각도로 도달 판정 |
+| P2 APPROACHING | YAW 정렬하며 전진 접근. 짐벌 각도로 도달 판정 |
 | P3 DROPPING | 5초 대기 → 그리퍼 개방 → 버티포트에 사출 요청 |
-| P4 RTL | 복귀. 복귀 중 ArUco 마커 탐색 |
-| P5 VERTIPORT_HOLD | 마커 락온. RTL을 끊고 2단계 정렬 |
+| P4 RTL | 복귀. 복귀 중 ArUco Marker 탐색 |
+| P5 VERTIPORT_HOLD | 마커 락온. RTL 중단 후 2단계 정렬 |
 | P6 DESCENDING | 수평 보정하며 등속 하강 |
 | P7 LANDED | PX4 `land()`에 위임. 접지 확인 |
 | P8 VERTIPORT | 리프트 상승 → 그리퍼 체결 → 리프트 하강 |
@@ -53,9 +53,9 @@ Pixhawk ──UART── Jetson ──┬── 14550 : pymavlink (짐벌 제어
 그래서 위치와 방향을 동시에 맞추지 않고 순차적으로 처리한다.
 
 ```
-POS  : 0번 마커 중심으로 병진만 (요 = 0)
+POS  : 0번 마커 중심으로 병진만 조정
   ↓ 오차 ≤ 0.08
-YAW  : 0→1번 마커 벡터로 방향만 (병진 = 0)
+YAW  : 0→1번 마커 벡터로 방향만 조정
   ↓ 오차 ≤ 8도
 HOLD : 미세 보정하며 3초 유지 → P6
 ```
@@ -172,7 +172,7 @@ python3 scripts/run_webcam_detector.py \
 ### 정지 이미지 검증
 
 카메라와 비행 컨트롤러 없이 YOLO 동작만 확인할 수 있다.
-테스트 이미지는 포함하지 않았으므로, 사람 전신이 나온 이미지를 아무거나 준비해 검증한다.
+테스트 이미지는 포함하지 않았으므로, 사람 전신이 적절히 나온 이미지를 준비해 검증한다.
 
 ```bash
 python3 scripts/run_image_detector.py \
@@ -207,14 +207,13 @@ QGroundControl에서 설정한다.
 
 | 상수 | 위치 | 대상 |
 |---|---|---|
-| `SIGN_LATERAL` | flight_fsm.py | 서보잉 좌우 |
-| `SIGN_FORWARD` | flight_fsm.py | 서보잉 전후 |
-| `SIGN_YAW` | flight_fsm.py | 서보잉 요 |
-| `SIGN_APPROACH_YAW` | flight_fsm.py | P2 접근 요 |
+| `SIGN_LATERAL` | flight_fsm.py | Servoing 좌우 |
+| `SIGN_FORWARD` | flight_fsm.py | Servoing 전후 |
+| `SIGN_YAW` | flight_fsm.py | Servoing YAW |
+| `SIGN_APPROACH_YAW` | flight_fsm.py | P2 접근 YAW |
 | `SIGN_GIMBAL_PITCH` | run_webcam_detector.py | 짐벌 추적 피치 |
 
 카메라를 다시 장착하거나 짐벌 마운트를 바꾸면 부호가 뒤집힐 수 있다.
-**부호가 틀린 상태로 비행하면 드론이 목표에서 멀어지는 방향으로 발산한다.**
 
 `for_indoor_test/verify_servo_direction.py`로 지상에서 검증한 뒤 반영한다.
 이 도구는 속도 명령을 계산만 하고 전송하지 않는다(DRY RUN).
@@ -224,7 +223,7 @@ QGroundControl에서 설정한다.
 `flight_fsm.py`의 `ESP32_URL`을 환경에 맞게 수정한다.
 
 ```python
-ESP32_URL = "http://172.20.10.12"   # 또는 "http://vertiport.local"
+ESP32_URL = "http://172.**.**.**"   # 또는 "http://vertiport.local"
 ```
 
 핫스팟을 재시작하면 IP가 바뀔 수 있다. 운용 전에 확인한다.
