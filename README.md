@@ -277,8 +277,12 @@ v4l2-ctl -d /dev/video0 -c exposure_time_absolute=30
 │   ├── usb_camera.py              UVC 카메라, 노출 제어
 │   └── vertiport_aruco.py         ArUco 검출, 정렬 가이던스
 └── for_indoor_test/
-    ├── verify_servo_direction.py  서보잉 부호 검증 (DRY RUN)
-    └── focus_tune.py              카메라 초점 조정
+│   ├── verify_servo_direction.py  서보잉 부호 검증 (DRY RUN)
+│   └── focus_tune.py              카메라 초점 조정
+└── vertiport_esp32/
+    └── vertiport_esp32.ino        버티포트 제어 펌웨어
+
+
 ```
 
 ---
