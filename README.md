@@ -15,7 +15,7 @@ RTL을 조대 정렬로, 비주얼 서보잉을 미세 정렬로 쓰는
 | 항목 | 사양 |
 |---|---|
 | 비행 컨트롤러 | Pixhawk 6C (PX4) |
-| 온보드 컴퓨터 | Jetson Orin Nano Super 8GB |
+| 온보드 컴퓨터 | Jetson Orin Nano |
 | 카메라 | ELP-USBGS1200P01 (AR0234 글로벌 셔터, 1920×1200) |
 | 짐벌 | 2축 (롤/피치 보상). 카본 파이프로 전방 26cm 돌출 |
 | 지상국 | QGroundControl |
